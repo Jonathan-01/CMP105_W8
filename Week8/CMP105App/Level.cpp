@@ -1,12 +1,24 @@
 #include "Level.h"
+#include "Ball.h"
+#include "Framework/Collision.h"
 
-Level::Level(sf::RenderWindow* hwnd, Input* in)
+Level::Level(sf::RenderWindow* hwnd, Input* in) : ball1(hwnd), ball2(hwnd)
 {
 	window = hwnd;
 	input = in;
 
 	// initialise game objects
+	ballTexture.loadFromFile("gfx/Beach_Ball.png");
 
+	ball1.setSize(sf::Vector2f(100, 100));
+	ball1.setPosition(100, 100);
+	ball1.setTexture(&ballTexture);
+	ball1.setInput(input);
+
+	ball2.setSize(sf::Vector2f(100, 100));
+	ball2.setPosition(window->getSize().x - 200, window->getSize().y - 200);
+	ball2.setTexture(&ballTexture);
+	ball2.setInput(input);
 }
 
 Level::~Level()
@@ -23,14 +35,21 @@ void Level::handleInput(float dt)
 // Update game objects
 void Level::update(float dt)
 {
-	
+	ball1.update(dt);
+	ball2.update(dt);
+	if (Collision::checkBoundingCircle(&ball1, &ball2)) 
+	{
+		ball1.collisionResponse(NULL);
+		ball2.collisionResponse(NULL); 
+	}
 }
 
 // Render level
 void Level::render()
 {
 	beginDraw();
-
+	window->draw(ball1);
+	window->draw(ball2);
 	endDraw();
 }
 
